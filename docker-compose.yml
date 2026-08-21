@@ -17,10 +17,10 @@ services:
       retries: 10
 
   api:
-    build: ./server
+    build: .
     restart: unless-stopped
     env_file:
-      - ./server/.env
+      - .env
     environment:
       DATABASE_URL: postgresql://patinhas:patinhas@db:5432/patinhas_store?schema=public
     ports:
