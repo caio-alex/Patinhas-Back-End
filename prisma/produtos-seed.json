@@ -5,7 +5,7 @@
     "categoria": "cachorro",
     "preco": 129.99,
     "tipo": "Alimento",
-    "imagem": "https://images.petz.com.br/fotos/1713803501124_mini.jpg"
+    "imagem": "/produtos/racao_seca.jpg"
   },
   {
     "id": 2,
