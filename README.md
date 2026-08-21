@@ -1,7 +1,3 @@
-
-Conversa com o Gemini
-Faça um readme completo do projeto back-end
-
 ⚙️ Pré-requisitos
 Para executar este projeto localmente, certifique-se de ter as seguintes ferramentas instaladas:
 
