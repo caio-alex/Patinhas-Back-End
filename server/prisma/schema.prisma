@@ -1,0 +1,107 @@
+// Schema do banco - Patinhas Store
+// Rode `npx prisma migrate dev` (dentro de server/) para aplicar
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id        String   @id @default(uuid())
+  nome      String
+  email     String   @unique
+  senhaHash String
+  cpf       String?  @unique
+  celular   String?
+  telefone  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  enderecos     Endereco[]
+  pedidos       Pedido[]
+  refreshTokens RefreshToken[]
+
+  @@map("usuarios")
+}
+
+model Endereco {
+  id        String   @id @default(uuid())
+  usuarioId String
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  rua       String
+  cidade    String
+  estado    String
+  cep       String?
+  principal Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@map("enderecos")
+}
+
+// Refresh tokens ficam no banco para permitir revogação (logout / troca de senha
+// invalida sessões antigas) em vez de confiar só na expiração do JWT.
+model RefreshToken {
+  id        String   @id @default(uuid())
+  usuarioId String
+  usuario   Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+model Produto {
+  id        Int      @id @default(autoincrement())
+  titulo    String
+  categoria String // cachorro | gato | aves | peixe | casajardim
+  tipo      String // Alimento | Higiene | Ambiente ...
+  preco     Decimal  @db.Decimal(10, 2)
+  imagem    String
+  ativo     Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  itensPedido ItemPedido[]
+
+  @@map("produtos")
+}
+
+enum StatusPedido {
+  PENDENTE
+  PAGO
+  ENVIADO
+  ENTREGUE
+  CANCELADO
+}
+
+model Pedido {
+  id        String       @id @default(uuid())
+  usuarioId String
+  usuario   Usuario      @relation(fields: [usuarioId], references: [id])
+  status    StatusPedido @default(PENDENTE)
+  total     Decimal      @db.Decimal(10, 2)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  itens ItemPedido[]
+
+  @@map("pedidos")
+}
+
+model ItemPedido {
+  id         String  @id @default(uuid())
+  pedidoId   String
+  pedido     Pedido  @relation(fields: [pedidoId], references: [id], onDelete: Cascade)
+  produtoId  Int
+  produto    Produto @relation(fields: [produtoId], references: [id])
+  quantidade Int
+  precoUnit  Decimal @db.Decimal(10, 2) // preço no momento da compra, não muda se o produto mudar de preço depois
+
+  @@map("itens_pedido")
+}
