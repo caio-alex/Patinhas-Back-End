@@ -16,8 +16,8 @@ const app = express();
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || "http://localhost:3000",
-    credentials: true, // necessário para o cookie httpOnly do refresh token
+    origin: "*", // Permite requisições de qualquer lugar (ótimo para portfólio e testes públicos)
+    credentials: true,
   })
 );
 app.use(express.json({ limit: "50kb" })); // limite evita payloads gigantes de DoS
