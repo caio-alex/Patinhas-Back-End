@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: patinhas
       POSTGRES_DB: patinhas_store
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - patinhas_db_data:/var/lib/postgresql/data
     healthcheck:
@@ -22,7 +22,7 @@ services:
     env_file:
       - .env
     environment:
-      DATABASE_URL: postgresql://patinhas:patinhas@db:5432/patinhas_store?schema=public
+      DATABASE_URL: "postgresql://patinhas:patinhas@db:5432/patinhas_store"
     ports:
       - "3333:3333"
     depends_on:
