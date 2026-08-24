@@ -45,7 +45,7 @@
     "categoria": "cachorro",
     "preco": 100.00,
     "tipo":"Alimento",
-    "imagem": "https://images.petz.com.br/fotos/1656078239241_mini.jpg"
+    "imagem": "/produtos/racao_premier.jpg"
   },
   {
     "id": 7,
@@ -53,7 +53,7 @@
     "categoria": "cachorro",
     "preco": 68.00,
     "tipo":"Higiene",
-    "imagem": "https://images.petz.com.br/fotos/1721844807565_mini.jpg"
+    "imagem": "/produtos/tapete.jpg"
   },
   {
     "id": 8,
