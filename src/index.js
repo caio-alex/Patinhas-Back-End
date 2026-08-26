@@ -14,10 +14,26 @@ const { errorHandler } = require("./middleware/errorHandler");
 const app = express();
 
 app.use(helmet());
+// CORS_ORIGIN aceita uma lista separada por vírgula (ex: dev local + produção).
+// Nunca respondemos com "*" - obrigatório porque as requisições usam
+// credentials:include (cookie httpOnly do refresh token), e o navegador
+// bloqueia qualquer combinação de credentials:include com Access-Control-
+// -Allow-Origin curinga.
+const origensPermitidas = (process.env.CORS_ORIGIN || "http://localhost:3000")
+  .split(",")
+  .map((origem) => origem.trim());
+
 app.use(
   cors({
-    origin: "*", // Permite requisições de qualquer lugar (ótimo para portfólio e testes públicos)
-    credentials: true,
+    origin: (origin, callback) => {
+      // Sem header Origin (chamada servidor-a-servidor, curl, healthcheck) - libera
+      if (!origin || origensPermitidas.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Origem não permitida pelo CORS"));
+      }
+    },
+    credentials: true, // necessário para o cookie httpOnly do refresh token
   })
 );
 app.use(express.json({ limit: "50kb" })); // limite evita payloads gigantes de DoS
@@ -34,6 +50,11 @@ app.use(
 );
 
 app.get("/health", (req, res) => res.json({ status: "ok" }));
+
+// Serve as imagens de produto baixadas localmente (public/imagens/*.jpg).
+// Ficam versionadas no Git, então sobrevivem a redeploys mesmo com disco
+// "ephemeral" no Render - o arquivo já vem dentro do container a cada build.
+app.use("/imagens", express.static("public/imagens"));
 
 app.use("/auth", authRoutes);
 app.use("/produtos", produtosRoutes);
